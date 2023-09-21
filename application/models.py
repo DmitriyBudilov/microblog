@@ -2,11 +2,15 @@ from datetime import datetime
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_login import LoginManager, UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
 
 db =SQLAlchemy()
 migrate = Migrate()
+login = LoginManager()
+login.login_view = 'login'
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(
         db.Integer,
@@ -33,6 +37,12 @@ class User(db.Model):
 
     def __repr__(self):
         return f'User:\t{self.username}\n'
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
     
 class Post(db.Model):
     __tablename__ = 'posts'
@@ -55,3 +65,7 @@ class Post(db.Model):
 
     def __repr__(self):
         return f'Post: \n\t{self.body}\n'
+        
+@login.user_loader
+def load_user(id):
+    return db.session.get(User, int(id))
