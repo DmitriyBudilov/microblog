@@ -41,27 +41,27 @@ class RegistrationForm(FlaskForm):
         validators=[
             DataRequired(message='Enter username!')
         ]
-    ),
+    )
     email = StringField(
         label='Email',
         validators=[
             DataRequired(message='Enter email!'),
             Email(message='With str is not email!')
         ]
-    ),
+    )
     password = PasswordField(
         label='Password',
         validators=[
             DataRequired(message='Enter password!')
         ]
-    ),
+    )
     password2 = PasswordField(
         label='Repeat Password',
         validators=[
             DataRequired(message='Enter password'),
-            EqualTo(message='Not equal to password!')
+            EqualTo(fieldname='password', message='Not equal to password!')
         ]
-    ),
+    )
     submit = SubmitField(
         label='Register'
     )
