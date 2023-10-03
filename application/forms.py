@@ -42,7 +42,7 @@ class RegistrationForm(FlaskForm):
             DataRequired(message='Enter username!')
         ]
     )
-    email = StringField(
+    email = EmailField(
         label='Email',
         validators=[
             DataRequired(message='Enter email!'),

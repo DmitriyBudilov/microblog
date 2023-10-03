@@ -1,4 +1,5 @@
 from datetime import datetime
+from hashlib import md5
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -43,6 +44,10 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+    
+    def avatar(self, size):
+        digest = md5(self.email.lower().encode('utf-8')).hexdigest()
+        return f'https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}'
     
 class Post(db.Model):
     __tablename__ = 'posts'

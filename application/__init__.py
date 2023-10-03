@@ -5,7 +5,7 @@ from .models import db, migrate, login
 
 app = Flask(
     import_name=__name__,
-    instance_relative_config=False
+    # instance_relative_config=False
     )
 app.config.from_object("config.DevelopmentConfig")
 
