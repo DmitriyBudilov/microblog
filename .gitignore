@@ -1,8 +1,10 @@
 __pycache__/
 .venv/
+logs/
 
 *.env
 *.db
+*.log
 
 config.py
 
