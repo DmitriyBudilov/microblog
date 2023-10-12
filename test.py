@@ -28,6 +28,12 @@ class UserModelCase(unittest.TestCase):
         self.assertEqual(u.avatar(128), ('https://www.gravatar.com/avatar/'
                                          'd4c74594d841139328695756648b6bd6'
                                          '?d=identicon&s=128'))
+        
+    def test_follow(self):
+        u1 = User(username='jonh', email='john@example.com')
+        u2 = User(username='susan', email='susan@example.com')
+        db.session.add(u1)
+        db.session.add(u2)
     
 if __name__ == '__main__':
     unittest.main(verbosity=2)
