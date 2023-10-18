@@ -20,12 +20,13 @@ from werkzeug.urls import url_parse
 from application import app, db
 from application.forms import (
     EditProfileForm,
+    EmptyForm,
     LoginForm,
-    RegistrationForm,
-    EmptyForm
+    PostForm,
+    RegistrationForm
 )
 
-from application.models import User
+from application.models import User, Post
 
 @app.before_request
 def before_request():
@@ -33,21 +34,19 @@ def before_request():
         current_user.last_seen = datetime.utcnow()
         db.session.commit()
 
-@app.route('/')
-@app.route('/index/')
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/index/', methods=['GET', 'POST'])
 @login_required
 def index():
-    posts = [
-        {
-            'author': {'username': 'John'},
-            'body': 'Beautiful day!'
-        },
-        {
-            'author': {'username': 'Susan'},
-            'body': 'The Avengers movie was so cool!'
-        }
-    ]
-    return render_template('index.jinja2', title='Home', posts=posts)
+    form = PostForm()
+    if form.validate_on_submit():
+        post = Post(body=form.post.data, author=current_user)
+        db.session.add(post)
+        db.session.commit()
+        flash('You post is now live!')
+        return redirect(url_for('index'))
+    posts = current_user.followed_posts().all()
+    return render_template('index.jinja2', title='Home', posts=posts, form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -89,10 +88,7 @@ def register():
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
-    posts = [
-            {'author': user, 'body': 'Test post #1'},
-            {'author': user, 'body': 'Test post #2'}
-            ]
+    posts = user.posts.all()
     form = EmptyForm()
     return render_template('user.jinja2', user=user, posts=posts, form=form)
 
@@ -148,4 +144,10 @@ def unfollow(username):
         return redirect(url_for('user', username=username))
     else:
         return redirect(url_for('index'))
+    
+@app.route('/explore')
+@login_required
+def explore():
+    posts = Post.query.order_by(Post.timestamp.desc()).all()
+    return render_template('index.jinja2', title='Explorer', posts=posts)
 
